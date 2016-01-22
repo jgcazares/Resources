@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
 #if defined (_WIN32) || (_WIN64)
 
 	cout << "running on windows" << endl;
+	cout << "Added on windows" << endl;
 
 #endif
 
