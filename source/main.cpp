@@ -29,6 +29,11 @@
 
 using namespace std;
 
+//variables for the backgrounds speed
+int bkgd1Speed = 100;
+
+SDL_Rect bkgd1Pos, bkgd2Pos;
+
 //code for framerate independence
 float deltaTime = 0.0;
 int thisTime = 0;
