@@ -35,7 +35,7 @@
 
 #endif
 
-//#include "SDL.h"
+
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -57,7 +57,7 @@ int thisTime = 0;
 int lastTime = 0;
 
 //MOVE THE BAKCGROUND
-void UpdateBackground() {
+void UpdateBackground(float deltaTime) {
 
 	//Update the bkgd 1
 	b1pos_y += (bkgdSpeed * 1) * deltaTime;
@@ -93,6 +93,96 @@ void UpdateBackground() {
 	}
 
 }
+
+
+////////*****************joystick dead zone*********************
+//analog stick dead zone
+const int JOYSTICK_DEAD_ZONE = 8000;
+
+//joystick direction vars
+float xDir, yDir;
+
+//create sedl rectangle for the two player graphic
+SDL_Rect cursorPos, activePos;
+
+//cursor float movement
+float pos_X, pos_Y;
+
+//cursor speed
+int cursorSpeed = 400;
+
+void moveCursor(const SDL_ControllerAxisEvent){
+
+	if(event.which == 0){
+		if(event.axis == 0){
+
+			if(event.value < -JOYSTICK_DEAD_ZONE){
+				xDir = -1.0f;
+			}else if(event.value > JOYSTICK_DEAD_ZONE){
+				xDir = 1.0f;
+			}else{
+				xDir = 0.0f;
+			}
+		}
+
+		if(event.axis == 1){
+
+			if(event.value < -JOYSTICK_DEAD_ZONE){
+				yDir = -1.0f;
+			}else if(event.value > JOYSTICK_DEAD_ZONE){
+				yDir = 1.0f;
+			}else{
+				yDir = 0.0f;
+			}
+
+		}
+
+
+
+	}
+
+
+}
+
+void UpdateCursor(float deltaTime){
+	//update the cursor
+	pos_X += (cursorSpeed * xDir) * deltaTime;
+	pos_Y += (cursorSpeed * yDir) * deltaTime;
+
+	cursorPos.x = (int)(pos_X + 0.5f);
+	cursorPos.y = (int)(pos_Y + 0.5f);
+
+	activePos.x = cursorPos.x;
+	activePos.y = cursorPos.y;
+
+	if(cursorPos.x < 0){
+		cursorPos.x = 0;
+		pos_X = cursorPos.x;
+
+	}
+
+	if(cursorPos.x > 1024 - cursorPos.w){
+		cursorPos.x = 1024 - cursorPos.w;
+		pos_X = cursorPos.x;
+	}
+
+	if(cursorPos.y < 0){
+		cursorPos.y = 0;
+		pos_Y = cursorPos.y;
+	}
+
+	if(cursorPos.y > 768 - cursorPos.h){
+		cursorPos.y = 768 - cursorPos.h;
+		pos_Y = cursorPos.y;
+	}
+
+}
+
+
+//variables for all the menus button over
+bool players1Over = false, players2Over = false, instructionsOver = false,
+		quitOver = false, menuOver = false, playOver = false;
+
 
 
 
@@ -164,7 +254,7 @@ int main(int argc, char* argv[]) {
 
 	//***********CREATE BACKGROUND************
 	// create a SDL surface to hold the background image
-	SDL_Surface *surface = IMG_Load((images_dir + "Placeholder.png").c_str());
+	SDL_Surface *surface = IMG_Load((images_dir + "Background.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *bkgd1;
@@ -198,7 +288,7 @@ int main(int argc, char* argv[]) {
 	//////***********************************CREATE BAKCGROUND END *******************
 
 	////////************************cursor START****************************
-	surface = IMG_Load((images_dir + "JorgeCursor.png").c_str());
+	surface = IMG_Load((images_dir + "Cursor.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *cursor;
@@ -211,7 +301,7 @@ int main(int argc, char* argv[]) {
 
 
 	//create sdl rect for title
-	SDL_Rect cursorPos, activePos;
+	//SDL_Rect cursorPos, activePos;
 
 	//set the X Y W H for the cursor graphic
 	cursorPos.x = 0;
@@ -226,7 +316,7 @@ int main(int argc, char* argv[]) {
 	activePos.h = 10;
 
 	//cursor speed
-	int cursorSpeed = 400;
+	//int cursorSpeed = 400;
 
 	////////***********************CURSOR END
 
@@ -236,7 +326,7 @@ int main(int argc, char* argv[]) {
 
 	/////*****************************TITLE START**************************
 	// create a SDL surface to hold the background image
-	surface = IMG_Load((images_dir + "Title_n.png").c_str());
+	surface = IMG_Load((images_dir + "Title.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *title;
@@ -259,7 +349,7 @@ int main(int argc, char* argv[]) {
 	////*********************** TITLE END
 
 	///************************PLAYER ONE****************************
-	surface = IMG_Load((images_dir + "Player1_n.png").c_str());
+	surface = IMG_Load((images_dir + "one_N.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *oneN;
@@ -271,7 +361,7 @@ int main(int argc, char* argv[]) {
 	SDL_FreeSurface(surface);
 
 	//over state
-	surface = IMG_Load((images_dir + "Player1_o.png").c_str());
+	surface = IMG_Load((images_dir + "one_O.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *oneO;
@@ -294,7 +384,7 @@ int main(int argc, char* argv[]) {
 	////////**********************PLAYER ONE END
 
 	////////************************PLAYER TWO****************************
-	surface = IMG_Load((images_dir + "Player2_n.png").c_str());
+	surface = IMG_Load((images_dir + "two_N.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *twoN;
@@ -306,7 +396,7 @@ int main(int argc, char* argv[]) {
 	SDL_FreeSurface(surface);
 
 	//over state
-	surface = IMG_Load((images_dir + "Player2_o.png").c_str());
+	surface = IMG_Load((images_dir + "two_O.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *twoO;
@@ -330,7 +420,7 @@ int main(int argc, char* argv[]) {
 
 
 	////////************************INSTRUCTIONS****************************
-	surface = IMG_Load((images_dir + "Instructions_n.png").c_str());
+	surface = IMG_Load((images_dir + "instructions_N.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *instructN;
@@ -342,7 +432,7 @@ int main(int argc, char* argv[]) {
 	SDL_FreeSurface(surface);
 
 	//over state
-	surface = IMG_Load((images_dir + "intructions_o.png").c_str());
+	surface = IMG_Load((images_dir + "instructions_O.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *instructO;
@@ -366,7 +456,7 @@ int main(int argc, char* argv[]) {
 
 
 	////////************************QUIT START****************************
-	surface = IMG_Load((images_dir + "Quit_n.png").c_str());
+	surface = IMG_Load((images_dir + "Quit_N.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *quitN;
@@ -378,7 +468,7 @@ int main(int argc, char* argv[]) {
 	SDL_FreeSurface(surface);
 
 	//over state
-	surface = IMG_Load((images_dir + "quit_o.png").c_str());
+	surface = IMG_Load((images_dir + "quit_O.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *quitO;
@@ -434,7 +524,7 @@ int main(int argc, char* argv[]) {
 
 	/////*************PLAY AGAIN graphics***********************
 	// create a SDL surface to hold the background image
-	surface = IMG_Load((images_dir + "play_n.png").c_str());
+	surface = IMG_Load((images_dir + "Play_N.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *playN;
@@ -446,7 +536,7 @@ int main(int argc, char* argv[]) {
 	SDL_FreeSurface(surface);
 
 	// create a SDL surface to hold the background image
-	surface = IMG_Load((images_dir + "play_o.png").c_str());
+	surface = IMG_Load((images_dir + "Play_O.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *playO;
@@ -502,7 +592,7 @@ int main(int argc, char* argv[]) {
 
 	/////*************instuctions graphics***********************
 	// create a SDL surface to hold the background image
-	surface = IMG_Load((images_dir + "Instuctions.png").c_str());
+	surface = IMG_Load((images_dir + "Instructions.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *instuctionsText;
@@ -524,7 +614,7 @@ int main(int argc, char* argv[]) {
 
 	/////*************small menu graphics***********************
 	// create a SDL surface to hold the background image
-	surface = IMG_Load((images_dir + "Menu_n.png").c_str());
+	surface = IMG_Load((images_dir + "menu_N.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *menuN;
@@ -536,7 +626,7 @@ int main(int argc, char* argv[]) {
 	SDL_FreeSurface(surface);
 
 	// create a SDL surface to hold the background image
-	surface = IMG_Load((images_dir + "Menu_o.png").c_str());
+	surface = IMG_Load((images_dir + "menu_O.png").c_str());
 
 	//create an sdl texture
 	SDL_Texture *menuO;
@@ -662,11 +752,25 @@ int main(int argc, char* argv[]) {
 						}
 						break;
 
+						///////*******************NEW***********************
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(event.caxis);
+						break;
+						/////////////**************new**********************
+
 					}
 				}
 
 				//****************************UPDATE SECTION*******************************
-				UpdateBackground();
+				UpdateBackground(deltaTime);
+				UpdateCursor(deltaTime);
+
+				//check for collision between cursor active state and buttons
+				players1Over = SDL_HasIntersection(&activePos, &oneNPos);
+				players2Over = SDL_HasIntersection(&activePos, &twoNPos);
+				instructionsOver = SDL_HasIntersection(&activePos, &instructNPos);
+				quitOver = SDL_HasIntersection(&activePos, &quitNPos);
 			
 
 				//*********************************DRAW SECTION***************************************
@@ -683,17 +787,35 @@ int main(int argc, char* argv[]) {
 				//draw the title image
 				SDL_RenderCopy(renderer, title, NULL, &cursorPos);
 
-				//draw the player 1 image
-				SDL_RenderCopy(renderer, oneN, NULL, &oneNPos);
+				/////////*******************NEW********************
+				//draw the player 1 button
+				if(players1Over){
+					SDL_RenderCopy(renderer, oneN, NULL, &oneNPos);
+				}else{
+					SDL_RenderCopy(renderer, oneO, NULL, &oneNPos);
+				}
 
-				//draw the player 2 image
-				SDL_RenderCopy(renderer, twoN, NULL, &twoNPos);
+				//draw the player 2 button
+				if(players2Over){
+					SDL_RenderCopy(renderer, twoN, NULL, &twoNPos);
+				}else{
+					SDL_RenderCopy(renderer, twoO, NULL, &twoNPos);
+				}
 
-				//draw the instructions  image
-				SDL_RenderCopy(renderer, instructN, NULL, &instructNPos);
+				//draw the instructions button
+				if(instructionsOver){
+					SDL_RenderCopy(renderer, instructN, NULL, &instructNPos);
+				}else{
+					SDL_RenderCopy(renderer, instructO, NULL, &instructNPos);
+				}
 
-				//draw the quit  image
-				SDL_RenderCopy(renderer, quitN, NULL, &quitNPos);
+				//draw the quit game button
+				if(quitOver){
+					SDL_RenderCopy(renderer, quitN, NULL, &quitNPos);
+				}else{
+					SDL_RenderCopy(renderer, quitN, NULL, &quitNPos);
+				}
+
 
 				//draw the cursor  image
 				SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
@@ -755,7 +877,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				//****************************UPDATE SECTION*******************************
-				UpdateBackground();
+				UpdateBackground(deltaTime);
 
 
 
@@ -844,7 +966,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				//****************************UPDATE SECTION*******************************
-				UpdateBackground();
+				UpdateBackground(deltaTime);
 
 				//*********************************DRAW SECTION***************************************
 
@@ -924,7 +1046,7 @@ int main(int argc, char* argv[]) {
 
 
 				//****************************UPDATE SECTION*******************************
-				UpdateBackground();
+				UpdateBackground(deltaTime);
 
 				//*********************************DRAW SECTION***************************************
 
@@ -999,7 +1121,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				//****************************UPDATE SECTION*******************************
-				UpdateBackground();
+				UpdateBackground(deltaTime);
 
 				//*********************************DRAW SECTION***************************************
 
@@ -1084,7 +1206,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				//****************************UPDATE SECTION*******************************
-				UpdateBackground();
+				UpdateBackground(deltaTime);
 
 				//*********************************DRAW SECTION***************************************
 
