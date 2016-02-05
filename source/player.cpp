@@ -59,4 +59,36 @@ void Player::Update(float deltaTime){
 	pos_X += (speed * xDir) * deltaTime;
 	pos_Y += (speed * yDir) * deltaTime;
 
+	//update the player position with code to account for precision loss
+	posRect.x = (int)(pos_X + 0.5f);
+	posRect.y = (int)(pos_Y + 0.5f);
+
+	if(posRect.x < 0){
+		posRect.x = 0;
+		pos_X = posRect.x;
+	}
+
+	if(posRect.x > 1024 - posRect.w){
+		posRect.x = 1024 - posRect.w;
+		pos_X = posRect.x;
+	}
+
+	if(posRect.y < 0){
+		posRect.y = 0;
+		pos_Y = posRect.y;
+	}
+
+	if(posRect.y > 768 - posRect.h){
+		posRect.y = 768 - posRect.h;
+		pos_X = posRect.y;
+	}
+
 }
+
+//player draw method
+void Player::Draw(SDL_Renderer *renderer)
+{
+	//draw the player texture using the vars texture ad posRec
+	SDL_RenderCopy(renderer, texture, NULL, &posRect);
+}
+
