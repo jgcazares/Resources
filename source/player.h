@@ -18,9 +18,15 @@
 #include <iostream>
 using namespace std;
 
+#include <vector>
+#include "bullet.h"
+
 class Player{
 
 public:
+
+	//variable to hold the bullet list
+	vector<Bullet> bulletList;
 
 	//string to hold the plath to the players texture
 	string playerPath;
@@ -66,4 +72,7 @@ public:
 
 	//players destrucion method
 	~Player();
+
+private:
+	void CreateBullet();
 };

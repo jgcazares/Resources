@@ -253,6 +253,13 @@ int main(int argc, char* argv[]) {
 	//create the renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+	// ************************* create the player ***********************************
+
+	Player player1 = Player(renderer, 0, images_dir.c_str(), 250.0, 500.0);
+	Player player2 = Player(renderer, 1, images_dir.c_str(), 750.0, 500.0);
+
+	// ************************* player end ******************************************
+
 	//***********CREATE BACKGROUND************
 	// create a SDL surface to hold the background image
 	SDL_Surface *surface = IMG_Load((images_dir + "Background.png").c_str());
@@ -665,14 +672,23 @@ int main(int argc, char* argv[]) {
 	//	//Update the surface
 	//	SDL_UpdateWindowSurface(window);
 	//
-		//****set up the game controller*******
-	SDL_GameController* gGameController = NULL;
-
-	//*****open gam controller*****
-	gGameController = SDL_GameControllerOpen(0);
 
 	//******turn on events****
 	SDL_GameControllerEventState(SDL_ENABLE);
+	
+	//****set up the game controller*******
+	SDL_GameController* gGameController0 = NULL;
+
+	//*****open gam controller*****
+	gGameController0 = SDL_GameControllerOpen(0);
+
+	//****set up the game controller2*******
+	SDL_GameController* gGameController1 = NULL;
+
+	//*****open gam controller2*****
+	gGameController1 = SDL_GameControllerOpen(1);
+
+
 
 	//*****sdl event to handle input
 	SDL_Event event;
@@ -968,18 +984,26 @@ int main(int argc, char* argv[]) {
 
 						if (event.cdevice.which == 0)
 						{
-							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 							{
 								players1 = false;
 								gameState = WIN;
 							}
-							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
 							{
 								players1 = false;
 								gameState = LOSE;
 							}
 
+							//send button press info to player 1p
+							player1.OnControllerButton(event.cbutton);
+
 						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						player1.OnControllerAxis(event.caxis);
 						break;
 
 					}
@@ -987,6 +1011,9 @@ int main(int argc, char* argv[]) {
 
 				//****************************UPDATE SECTION*******************************
 				UpdateBackground(deltaTime);
+
+				//update the player1
+				player1.Update(deltaTime);
 
 				//*********************************DRAW SECTION***************************************
 
@@ -1000,7 +1027,10 @@ int main(int argc, char* argv[]) {
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				//draw the bkgd2 image
-				SDL_RenderCopy(renderer, oneN, NULL, &oneNPos);
+				//SDL_RenderCopy(renderer, oneN, NULL, &oneNPos);
+
+				//draw the player
+				player1.Draw(renderer);
 
 
 				//sdl renderer present
@@ -1042,20 +1072,33 @@ int main(int argc, char* argv[]) {
 
 					case SDL_CONTROLLERBUTTONDOWN:
 
-						if (event.cdevice.which == 0)
+						if (event.cdevice.which == 0 || event.cdevice.which == 1)
 						{
-							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 							{
 								players2 = false;
 								gameState = WIN;
 							}
-							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+							if (event.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
 							{
 								players2 = false;
 								gameState = LOSE;
 							}
 
 						}
+
+						//send the button press info for player 1
+						player1.OnControllerButton(event.cbutton);
+
+						//send the player 2 info
+						player2.OnControllerButton(event.cbutton);
+
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+						//send axis info to player 1
+						player1.OnControllerAxis(event.caxis);
+						player2.OnControllerAxis(event.caxis);
 						break;
 
 					}
@@ -1065,6 +1108,8 @@ int main(int argc, char* argv[]) {
 				//****************************UPDATE SECTION*******************************
 				UpdateBackground(deltaTime);
 
+				player1.Update(deltaTime);
+				player2.Update(deltaTime);
 				//*********************************DRAW SECTION***************************************
 
 				//clear sdl renderer
@@ -1077,8 +1122,13 @@ int main(int argc, char* argv[]) {
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				//draw the bkgd2 image
-				SDL_RenderCopy(renderer, twoN, NULL, &twoNPos);
+				//SDL_RenderCopy(renderer, twoN, NULL, &twoNPos);
 
+				//draw the player 1
+				player1.Draw(renderer);
+
+				//draw the player 2
+				player2.Draw(renderer);
 
 				//sdl renderer present
 				SDL_RenderPresent(renderer);
