@@ -4,13 +4,41 @@
 const int JOYSTICK_DEAD_ZONE_ = 8000;
 
 //player creation method
-Player::Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float y){
+Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPath, float x, float y){
 
 	//set the player number 0 or 1
 	playerNum = pNum;
 
 	//float for player speed
 	speed = 500.0f;
+
+	laser = Mix_LoadWAV((audioPath + "laser.wav").c_str());
+
+	//initial score and lives
+	oldScore = 0;
+	playerScore = 0;
+	oldLives = 0;
+	playerLives = 3;
+
+	//init the font
+	TTF_Init();
+
+	//load the font
+	font = TTF_OpenFont((audioPath + "Starjedi.ttf").c_str(), 40);
+
+	//see if this is player1, or player 2, and create the correct X and Y location
+	if(playerNum == 0){
+		//create score texture X and Y location
+		scorePos.x = scorePos.y = 10;
+		livesPos.x = 10;
+		livesPos.y = 40;
+	}else{
+		//create the socre texture X and Y position
+		scorePos.x = 650;
+		scorePos.y = 10;
+		livesPos.x = 650;
+		livesPos.y = 40;
+	}
 
 	//see if the player 1, player 2, and create the correct file path
 	if(playerNum = 0){
@@ -83,6 +111,9 @@ void Player::CreateBullet() {
 		//see if the bullet is not active
 		if (bulletList[i].active == false)
 		{
+			//play the over sound
+			Mix_PlayChannel(-1, laser, 0);
+
 			//set the bullet to active
 			bulletList[i].active == true;
 

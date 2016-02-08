@@ -11,7 +11,7 @@
 
 #if defined (__linux__)
 #include SDL2/SDL2.h
-#include SDL2image/SDL_image.h
+#include SDL2/SDL_image.h
 #endif
 
 #include <string>
