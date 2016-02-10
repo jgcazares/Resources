@@ -101,13 +101,19 @@ public:
 	void OnControllerButton(const SDL_ControllerButtonEvent event);
 
 	//update the player using the passed delta time
-	void Update(float deltaTime);
+	void Update(float deltaTime, SDL_Renderer *renderer);
 
 	//draw the players main
 	void Draw(SDL_Renderer *renderer);
 
 	//players destrucion method
 	~Player();
+
+	//update score
+	void UpdateScore(SDL_Renderer *renderer);
+
+	//update the score method
+	void UpdateLives(SDL_Renderer *renderer);
 
 private:
 	void CreateBullet();

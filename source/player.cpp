@@ -33,12 +33,18 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 		livesPos.x = 10;
 		livesPos.y = 40;
 	}else{
-		//create the socre texture X and Y position
+		//create the score texture X and Y position
 		scorePos.x = 650;
 		scorePos.y = 10;
 		livesPos.x = 650;
 		livesPos.y = 40;
 	}
+
+	//update the score method
+	UpdateScore(renderer);
+
+	//update the score method
+	UpdateLives(renderer);
 
 	//see if the player 1, player 2, and create the correct file path
 	if(playerNum = 0){
@@ -104,6 +110,77 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 
 }
 
+//update lives
+void Player::UpdateLives(SDL_Renderer *renderer){
+
+	//fix for the to_string problems on linux
+	string Result;	//string which will contain the result
+	ostringstream convert;		//stream used for the conversion
+	convert << playerLives;		///insert the textual representation of number in the characters in the stream
+	Result = convert.str();		//set the result to the contents of the stream
+
+	//create the text for the font textture
+	tempLives = "Player Lives: " + Result;
+
+	//check to see what the player this is and color the font as needed
+	if(playerNum == 0){
+		//place the player 1 score info into a surface
+		livesSurface = TTF_RenderText_Solid(font, tempLives.c_str(), colorP1);
+	}else{
+		//place the player 1 score into a surface
+		livesSurface = TTF_RenderText_Solid(font, tempLives.c_str(), colorP2);
+	}
+
+	//create the player score texture
+	livesTexture = SDL_CreateTextureFromSurface(renderer, livesSurface);
+
+	//get the width and height of the texture
+	SDL_QueryTexture(livesTexture, NULL, NULL, &livesPos, &livesPos.h);
+
+	//free the surface
+	SDL_FreeSurface(livesSurface);
+
+	//set old score
+	oldLives = playerLives;
+}
+
+
+//update score
+void Player::UpdateScore(SDL_Renderer *renderer){
+
+	//fix for the to_string problems onlinux
+	string Result;	//string which will contain the result
+	ostringstream convert;		//stream used for the conversion
+	convert << playerScore;		///insert the textual representation of number in the characters in the stream
+	Result = convert.str();		//set the result to the contents of the stream
+
+	//create the text for the font textture
+	tempScore = "Player Score " + Result;
+
+	//check to see what the player this is and color the font as needed
+	if(playerNum == 0){
+		//place the player 1 score info into a surface
+		scoreSurface = TTF_RenderText_Solid(font, tempScore.c_str(), colorP1);
+	}else{
+		//place the player 1 score into a surface
+		scoreSurface = TTF_RenderText_Solid(font, tempScore.c_str(), colorP2);
+	}
+
+	//create the player score texture
+	scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
+
+	//get the width and height of the texture
+	SDL_QueryTexture(scoreTexture, NULL, NULL, &scorePos, &scorePos.h);
+
+	//free the surface
+	SDL_FreeSurface(scoreSurface);
+
+	//set old score
+	oldScore = playerScore;
+}
+
+
+
 void Player::CreateBullet() {
 	//see if there is a bullet active to fire
 	for (int i = 0; i < bulletList.size(); i++)
@@ -144,7 +221,11 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		//if A button
 		if (event.button == 0)
 		{
-			cout << "Player 1 - button A" << endl;
+			//test - change the player score
+			playerScore += 10;
+
+			//test - change the player lives
+			playerLives -= 1;
 
 			//create a bullet
 			CreateBullet();
@@ -158,7 +239,11 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		//if A button
 		if(event.button == 0)
 		{
-			cout << "Player 2 - button A" << endl;
+			//test - change the player score
+			playerScore += 10;
+
+			//test - change the player lives
+			playerLives -= 1;
 
 			//create a bullet
 			CreateBullet();
@@ -221,7 +306,7 @@ void Player::OnControllerAxis(const SDL_ContollerAxisEvent event)
 }
 
 //player update method
-void Player::Update(float deltaTime){
+void Player::Update(float deltaTime, SDL_Renderer *renderer){
 
 	//adjust position floats based on speed, directions of joystick axis and deltatime
 	pos_X += (speed * xDir) * deltaTime;
@@ -262,6 +347,16 @@ void Player::Update(float deltaTime){
 		}
 	}
 
+	//should the score be updated
+	if(playerScore != oldScore){
+		UpdateScore(renderer);
+	}
+
+	//should the score be updated
+	if(playerLives != oldLives){
+		UpdateLives(renderer);
+	}
+
 
 }
 
@@ -281,6 +376,13 @@ void Player::Draw(SDL_Renderer *renderer)
 			bulletList[i].Draw(renderer);
 		}
 	}
+
+	//draw the player score
+	SDL_RenderCopy(renderer, scoreTexture, NULL, &scorePos);
+
+	//draw the player score
+	SDL_RenderCopy(renderer, livesTexture, NULL, &livesPos);
+
 }
 
 //player destruction method

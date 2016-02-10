@@ -187,9 +187,17 @@ bool players1Over = false, players2Over = false, instructionsOver = false,
 
 //class header includes
 #include "player.h"
+#include "enemy.h"
+#include <vector>
+#include <stdlib.h>
+#include <time.h>
 
+vector<Enemy> enemyList;
 
 int main(int argc, char* argv[]) {
+
+	//initialize the random seed
+	srand (time(NULL));
 
 #if defined (_WIN32) || (_WIN64)
 
@@ -1029,7 +1037,20 @@ int main(int argc, char* argv[]) {
 
 
 		case PLAYERS1:
+
+			enemyList.clear();
+
 			players1 = true;
+
+			//create the enemy pool
+			for(int i = 0; i < 6; i++)
+			{
+				//create the enemy
+				Enemy tmpEnemy(renderer, images_dir);
+
+				//add to the enemy list
+				enemyList.push_back(tmpEnemy);
+			}
 
 
 			while (players1)
@@ -1088,7 +1109,14 @@ int main(int argc, char* argv[]) {
 				UpdateBackground(deltaTime);
 
 				//update the player1
-				player1.Update(deltaTime);
+				player1.Update(deltaTime, renderer);
+
+				//update the enemies
+				for(int i = 0; i < enemyList.size(); i++)
+				{
+					//update enemy
+					enemyList[i].Update(deltaTime);
+				}
 
 				//*********************************DRAW SECTION***************************************
 
@@ -1100,6 +1128,13 @@ int main(int argc, char* argv[]) {
 
 				//draw the bkgd2 image
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				//draw the enemies
+				for(int i = 0; i < enemyList.size(); i++)
+				{
+					//draw enemies
+					enemyList[i].Draw(renderer);
+				}
 
 				//draw the bkgd2 image
 				//SDL_RenderCopy(renderer, oneN, NULL, &oneNPos);
@@ -1120,7 +1155,20 @@ int main(int argc, char* argv[]) {
 
 
 		case PLAYERS2:
+
+			enemyList.clear();
+
 			players2 = true;
+
+			//create the enemy pool
+			for(int i = 0; i < 12; i++)
+			{
+				//create the enemy
+				Enemy tmpEnemy(renderer, images_dir);
+
+				//add to the enemy list
+				enemyList.push_back(tmpEnemy);
+			}
 
 
 			while (players2)
@@ -1183,8 +1231,15 @@ int main(int argc, char* argv[]) {
 				//****************************UPDATE SECTION*******************************
 				UpdateBackground(deltaTime);
 
-				player1.Update(deltaTime);
-				player2.Update(deltaTime);
+				player1.Update(deltaTime, renderer);
+				player2.Update(deltaTime, renderer);
+
+				//update the enemies
+				for(int i = 0; i < enemyList.size(); i++)
+				{
+					//update enemy
+					enemyList[i].Update(deltaTime);
+				}
 				//*********************************DRAW SECTION***************************************
 
 				//clear sdl renderer
@@ -1195,6 +1250,13 @@ int main(int argc, char* argv[]) {
 
 				//draw the bkgd2 image
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				//draw the enemies
+				for(int i = 0; i < enemyList.size(); i++)
+				{
+					//draw enemies
+					enemyList[i].Draw(renderer);
+				}
 
 				//draw the bkgd2 image
 				//SDL_RenderCopy(renderer, twoN, NULL, &twoNPos);
