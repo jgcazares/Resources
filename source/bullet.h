@@ -47,6 +47,8 @@ public:
 	//bullet draw
 	void Draw(SDL_Renderer *renderer);
 
+	void Reset();
+
 	//bullet destruction method
 	~Bullet();
 };

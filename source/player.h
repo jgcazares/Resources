@@ -33,6 +33,9 @@ class Player{
 
 public:
 
+	//is the player still active
+	bool active;
+
 	//player score and lives
 	int playerScore, oldScore, playerLives, oldLives;
 
@@ -114,6 +117,9 @@ public:
 
 	//update the score method
 	void UpdateLives(SDL_Renderer *renderer);
+
+	//reset for the player
+	void Reset();
 
 private:
 	void CreateBullet();
